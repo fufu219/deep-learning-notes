@@ -1,28 +1,48 @@
-# Deep Learning Notes
+# CS224N: Natural Language Processing with Deep Learning
 
-个人深度学习自学记录，包含概念笔记、PyTorch 实验和错误分析。
+Personal learning repository for **Stanford CS224N (Spring 2024): Natural Language Processing with Deep Learning**.
 
-## 内容
+This repository documents my learning progress through lecture notes, programming assignments, and supplementary materials. It serves as a personal knowledge base for understanding NLP, deep learning, and Transformer-based language models.
 
-| 模块 | 内容 |
-|---|---|
-| 训练基础 | MLP、损失、优化、训练与评估 |
-| CNN | 卷积、池化、通道、感受野 |
-| NLP | 文本处理、词向量与序列模型，持续更新 |
+## Repository Structure
 
-## 运行环境
+```
+.
+├── README.md
+└── references/              # Supplementary learning materials
+└── notes/                   
+└── assignments/
+```
 
-Windows，Conda，Python，PyTorch，Jupyter Notebook。
-小规模实验使用 CPU。
-具体版本与运行步骤随各实验补充。
+The repository structure will be updated as the course progresses.
 
-## 使用方式
+## Learning Objectives
 
-笔记位于 notes，实验位于 notebooks，图片位于 assets。
-Notebook 中的训练单元格需要手动运行，避免重复训练。
+- Develop a solid understanding of fundamental NLP concepts and techniques.
+    
+- Understand word embeddings, neural language models, attention mechanisms, and Transformers.
+    
+- Strengthen mathematical understanding and practical implementation skills.
+    
+- Complete course assignments and document key insights.
+    
+- Build a foundation for further study of Large Language Models (LLMs).
+    
 
-## 资料与说明
+## Learning Materials
 
-参考 PyTorch 官方教程与相关课程。
-教学示例、个人实现和借鉴内容在相应文件中注明。
-本仓库为个人自学记录，不代表课程官方材料。
+**Course:** Stanford CS224N, Spring 2024
+
+**Official Website:** [https://web.stanford.edu/class/cs224n/](https://web.stanford.edu/class/cs224n/)
+
+**Framework:** PyTorch
+
+## Progress
+
+This repository is a work in progress. Notes and assignments will be updated as I proceed through the course.
+
+## Acknowledgments
+
+The learning materials are based on Stanford University's CS224N course. All credit for the original lectures and course materials belongs to their respective authors.
+
+The notes and implementations in this repository are intended for personal learning and educational purposes.

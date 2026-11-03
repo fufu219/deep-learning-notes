@@ -29,7 +29,7 @@ $$ \min_{\theta}J(\theta)\quad\Longleftrightarrow\quad\max_{\theta}L(\theta) $$
 
 那如何计算P（..|..,..）?
 **softmax**
-两套向量： ![示意图](./assets/Pasted%20image%2020261101120347.png)
+两套向量： ![示意图|393](./assets/Pasted%20image%2020261101120347.png)
 1. 对于center word **c**和context word **w** ，点积计算分数![示意图](./assets/Pasted%20image%2020261101120606.png)（标量，并非概率，理解为二者的匹配程度）
 2. 代入softmax，对算出来的分数取指数，得出概率。
 
