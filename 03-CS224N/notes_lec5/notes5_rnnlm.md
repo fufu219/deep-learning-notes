@@ -5,6 +5,7 @@
 ## L2正则化
 在原先更新参数的基础上加入**参数惩罚**，约束参数使其不要变太大
 ![420](assets/Pasted%20image%2020261106134527.png)
+
 λ：正则化强度。人为设置的超参数(hyperparameter)
 θ_k：第k个参数
 
@@ -44,6 +45,7 @@ W是  5×300 的权重矩阵，X 是 300乘500 的输入矩阵，结果是 5乘5
 $$
  \operatorname{Var}(W_i)=\frac{2}{n_{\mathrm{in}}+n_{\mathrm{out}}}
 $$
+
 W_i是权重矩阵的一个标量元素。n_in，n_out是该层的输入/输出维数。
 
 ## 优化器optimizer
@@ -134,28 +136,64 @@ $$
 **链式法则叠加贡献**
 沿每条路径乘局部导数，各条路径贡献相加，**随时间反向传播BPTT**。
 有时为节省训练开销会**截断truncation**。
+
 例：
 ![](assets/Pasted%20image%2020261107213440.png)
 
 训练时，无论算损失还是喂给下一步（teacher forcing），都只关注**正确词**。哪怕模型给错误词分配的概率更大。
 
 ## 生成文本
-rollout：用上一步概率分布抽到的词喂给下一步
+rollout：用上一步概率分布抽到的词喂给下一步。即重复采样，把结果送回模型。
+
 ## 评价模型
 **困惑度perplexity,PPL**: 面对一段真实文本，模型给每个下一个真实词的概率是多少。跟计算CE的是同一个东西。
+
 $$
  \mathrm{PPL} =\left(\frac{1}{p_1p_2\cdots p_T}\right)^{1/T}
 $$
- 其中，p_t表示第t步给真实词的概率。T是参与评价的预测步数。
- 例
- ![](assets/Pasted%20image%2020261107215555.png)
+
+其中，p_t表示第t步给真实词的概率。T是参与评价的预测步数。
+例
+
+![](assets/Pasted%20image%2020261107215555.png)
 
 跟交叉熵联系：
 $$
  \mathrm{PPL} =\exp\left(\frac1T\sum_{t=1}^{T}-\log p_t\right) =\exp(J). 
 $$
 
-正相关：在同一份测试文本、同一种切分方式下，**平均交叉熵越低，困惑度也越低
+正相关：在同一份测试文本、同一种切分方式下，**平均交叉熵越低，困惑度也越低**。
+
+Q：有了损失的概念为何还要引入PPL？区别是？
+A：可以直接1/PPL换回一个代表整段文本的概率，几何平均。
+
+# RNN问题：梯度消失与梯度爆炸vanishing and exploding gradient
+**为什么出问题**
+
+反向传播时按照链式法则连乘局部导数，梯度大小随传播距离快速缩小或放大。
+
+$$
+ \frac{\partial J^{(i)}}{\partial h^{(j)}} = \frac{\partial J^{(i)}}{\partial h^{(i)}}\,W_h^{\,i-j}. 
+$$
+
+矩阵W反复相乘。看特征值绝对值。
+
+梯度消失让RNN难以学习**长距离依赖（long-distance dependency）**。模型更容易根据近处的预测误差调整参数而非远处。
+
+**处理方法**
+**梯度裁剪（gradient clipping）**：按范数(norm)裁剪。向量长度超过阈值就按比例缩小整个梯度向量。
+
+$$
+ g_{\mathrm{clip}}=\frac{\tau}{\|g\|}\,g \qquad \text{当 }\|g\|>\tau. 
+$$
+
+# ending
+语言模型（language model，LM)在本讲中指根据前文给下一个词分配概率的模型。
+循环神经网络（recurrent neural network，RNN）是一类网络结构，它按顺序读入数据，每一步用同一套权重更新隐藏状态。把 RNN 的隐藏状态接到词表上的概率输出，就得到本讲的RNN 语言模型（RNN-LM）。
+
+序列标注sequence tagging对每个输入词输出一个标签。句子分类sentence classification给整句话一个标签。
+
+
 
 
 
