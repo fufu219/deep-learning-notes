@@ -43,7 +43,7 @@ W是  5×300 的权重矩阵，X 是 300乘500 的输入矩阵，结果是 5乘5
 **Xavier初始化**的方差公式，描述初始化时从哪个分布抽样，即抽出来的值通常离0有多远。
 
 $$
- \operatorname{Var}(W_i)=\frac{2}{n_{\mathrm{in}}+n_{\mathrm{out}}}
+ {Var}(W_i)=\frac{2}{n_{\mathrm{in}}+n_{\mathrm{out}}}
 $$
 
 W_i是权重矩阵的一个标量元素。n_in，n_out是该层的输入/输出维数。
@@ -70,6 +70,7 @@ n-gram预测下一个词时，只看它前面最近的n-1个词。如4gram，只
 ![](assets/Pasted%20image%2020261107200124.png)
 
 **计数法**预测概率
+
 $$
  \widehat P(w\mid h) = \frac{\operatorname{count}(h\,w)} {\operatorname{count}(h)}，eg: \widehat P(\text{books}\mid\text{students opened their})=\frac{400}{1000}=0.4
 $$
@@ -107,6 +108,7 @@ generate text：按概率采样sampling预测下一个词，生成后文。
 循环使用同一套权重，重复更新状态
 ![](assets/Pasted%20image%2020261107204322.png)
 其中
+
 $$
 h^{(t)}=\sigma\!\left(W_hh^{(t-1)}+W_e e^{(t)}+b_1\right)
 $$
