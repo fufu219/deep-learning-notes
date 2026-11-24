@@ -59,14 +59,16 @@ $$
 # machine translation机器翻译，MT
 把source language转换成target language，需要同时满足fidelity准确性和fluency流畅性
 
-统计机器翻译SMT从数据中学习概率模型。
+## 统计机器翻译SMT
+从数据中学习概率模型。
 
-| 部分                                   | 主要作用                     | 学习所需的数据                    |
-| ------------------------------------ | ------------------------ | -------------------------- |
-| **翻译模型（translation model）** (P(x\|y) | 衡量候选译文与源句之间的翻译对应关系，支持忠实性 | 平行语料（parallel data）        |
-| **语言模型（language model）** P(y)        | 衡量目标语言句子的概率，支持流畅性        | 目标语言单语语料（monolingual data） |
+| 部分                                  | 主要作用                     | 学习所需的数据                    |
+| ----------------------------------- | ------------------------ | -------------------------- |
+| **翻译模型（translation model）** P(x\|y) | 衡量候选译文与源句之间的翻译对应关系，支持忠实性 | 平行语料（parallel data）        |
+| **语言模型（language model）** P(y)       | 衡量目标语言句子的概率，支持流畅性        | 目标语言单语语料（monolingual data） |
 
-## neural machine translation神经机器翻译NMT
+平行语料parallel corpus指**互为翻译的文本对**组成的数据集
+## neural machine translation神经机器翻译NMT!!
 采用经典结构seq2seq，把一个输入序列转换成一个输出序列。
 
 | 组成               | 任务             | 输入与输出                |
@@ -76,4 +78,62 @@ $$
 
 RNN 编码器读取源句并形成编码状态，解码器以该状态为初始条件，根据此前的目标词逐步预测下一个词，直到生成结束符号。
 
-解码器每次预测都依赖**源句和此前的目标词**，所以是**条件语言模型**
+$$
+ P(y\mid x) = P(y_1\mid x) P(y_2\mid y_1,x) \cdots P(y_T\mid y_1,\ldots,y_{T-1},x).
+$$
+
+x是完整源句，y_t是第t个目标词，T是目标序列长度。每一项都是在源句和已有目标词已知时，下一个正确目标词的概率。相乘即整段目标序列的概率。
+
+解码器每次预测都依赖**源句和此前的目标词**，所以属于**条件语言模型**。
+
+损失计算同样是“模型给正确词的概率”取负对数。计算损失后，反向传播从这些预测出发，经过解码器，再沿编码状态回到编码器。这样，损失会同时推动解码器学习“怎样生成正确译文”，以及编码器学习“怎样表示源句，才能帮助翻译”。
+
+这就是**端到端训练（end-to-end training）**。编码器、解码器以及词嵌入、输出层等可训练参数，都通过**同一个翻译目标**联合更新。
+编码器与解码器的结构也能用于摘要、对话、代码生成等序列转换任务。
+
+So，监督式 seq2seq 训练用**正确目标**前缀预测下一个目标词，以逐步交叉熵构成训练损失，并将梯度通过解码器传播到编码器，联合学习整个翻译系统。
+
+code
+	`import torch.nn as nn`
+	
+	定义模型组件
+	source_embedding = nn.Embedding(source_vocab_size, embedding_size)
+	target_embedding = nn.Embedding(target_vocab_size, embedding_size)
+	
+	encoder = nn.LSTM(embedding_size, hidden_size, batch_first=True)
+	decoder = nn.LSTM(embedding_size, hidden_size, batch_first=True)
+	output_layer = nn.Linear(hidden_size, target_vocab_size)
+	
+	前向计算
+	source_vectors = source_embedding(source_ids)
+	_, encoder_state = encoder(source_vectors)
+	
+	target_vectors = target_embedding(target_input_ids)
+	decoder_outputs, _ = decoder(target_vectors, encoder_state)
+	
+	logits = output_layer(decoder_outputs)
+
+
+**多层结构与编码瓶颈bottleneck**
+在这种基本结构中，源句信息需要经由编码器最后传给解码器的固定大小状态，支持后续所有词的生成。源句越长、内容越复杂，让这个状态保留翻译所需的全部信息就越困难。
+
+# 整理
+
+|概念|它描述什么|在当前模型中的关系|
+|---|---|---|
+|**机器翻译 MT**|要完成的任务|将源语言文本转换成目标语言文本|
+|**神经机器翻译 NMT**|用神经网络完成翻译的方法类别|本讲正在介绍的方法|
+|**seq2seq／encoder–decoder**|组织输入到输出的整体结构|先编码源句，再解码译文，也可用于摘要等任务|
+|**编码器、解码器**|系统中两个组件的职责|分别负责读取输入、生成输出|
+|**RNN、LSTM**|可以用来构建组件的网络类型|本讲使用它们实现编码器和解码器|
+|**双向、多层**|网络可以采用的结构设计|编码器或解码器可根据任务采用适合的设计|
+|**端到端训练**|怎样优化整个系统|最终翻译损失联合更新相关模块|
+|**平行语料**|训练数据的组织形式|提供源句与正确译文|
+
+# 检查理解
+1. 编码器读完整个源句后，传给解码器的编码状态起什么作用？
+	编码器的最终状态 初始化 解码器的状态。
+2. 某个目标词预测错误产生的损失，能否更新编码器的参数？请说明梯度通过什么连接传回编码器。
+	可以。梯度经过解码器，沿（作为初始状态）传入的编码状态，回到编码器的计算和参数。
+
+
